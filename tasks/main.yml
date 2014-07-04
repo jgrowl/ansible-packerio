@@ -23,27 +23,25 @@
   with_items: packerio_package_list
   action: "{{ ansible_pkg_mgr }} state=present name={{ item }}"
 
-
 #   Download packer to the local source directory
-- name: Ensure download directory (local)
+- name: Ensure download directory
   tags: packerio
-  local_action: file
+  file:
     state=directory
     owner=0
     group=0
     mode=0755
     dest={{ ansible_data_path }}
 
-- name: Download packer.io distribution (local)
+- name: Download packer.io distribution
   tags: packerio
-  local_action: get_url
+  get_url:
     url={{ packerio_mirror }}/{{ packerio_filename }}
     dest={{ ansible_data_path }}/{{ packerio_filename }}
     owner=0
     group=0
     mode=0644
     sha256sum={{ packerio_sha256sum }}
-
 
 #   Install packer
 - name: Ensure installation directory
@@ -57,9 +55,7 @@
 
 - name: Install packer
   tags: packerio
-  unarchive:
-    src={{ ansible_data_path }}/{{ packerio_filename }}
-    dest={{ packerio_install_dir }}/{{ packerio_version }}
+  shell: unzip {{ ansible_data_path }}/{{ packerio_filename }} -d {{ packerio_install_dir }}/{{ packerio_version }} creates={{ packerio_install_dir }}/{{ packerio_version }}/packer
 
 - name: Gathering installed binaries
   tags: packerio
